@@ -8,18 +8,19 @@
     tools:context=".presentation.ShopItemActivity">
 
   <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/name"
+      android:id="@+id/tilName"
       android:layout_width="0dp"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintBottom_toTopOf="@+id/amount"
+      app:layout_constraintBottom_toTopOf="@+id/tilAmount"
       android:layout_height="wrap_content"
       tools:layout_editor_absoluteX="1dp"
       tools:layout_editor_absoluteY="177dp"
       app:layout_constraintVertical_chainStyle="packed">
 
     <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapWords"
@@ -29,17 +30,18 @@
 
 
   <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/amount"
+      android:id="@+id/tilAmount"
       android:layout_width="0dp"
-        app:layout_constraintBottom_toTopOf="@id/button"
+        app:layout_constraintBottom_toTopOf="@id/saveButton"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/name"
+      app:layout_constraintTop_toBottomOf="@+id/tilName"
       android:layout_height="wrap_content"
       tools:layout_editor_absoluteX="1dp"
       tools:layout_editor_absoluteY="177dp">
 
     <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
@@ -49,7 +51,7 @@
 
 
   <Button
-      android:id="@+id/button"
+      android:id="@+id/saveButton"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:text="Save"

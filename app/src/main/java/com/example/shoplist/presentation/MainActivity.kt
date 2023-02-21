@@ -25,7 +25,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.listOfItems.observe(this, {
             shopItemAdapter.submitList(it)
         })
-
+        binding.floatingActionButton.setOnClickListener({
+            val intent = ShopItemActivity.newIntentAdd(this)
+            startActivity(intent)
+        })
 
 
     }
@@ -69,7 +72,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpOnClickListener() {
         shopItemAdapter.onItemClickListener = {
-            Log.i("THISELEMENT", it.id.toString())
+            val intent = ShopItemActivity.newIntentEdit(this@MainActivity,it.id)
+            startActivity(intent)
         }
     }
 
