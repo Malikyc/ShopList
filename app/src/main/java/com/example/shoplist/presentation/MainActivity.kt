@@ -1,8 +1,10 @@
 package com.example.shoplist.presentation
 
+import android.app.FragmentContainer
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -10,9 +12,10 @@ import com.example.shoplist.R
 import com.example.shoplist.databinding.ActivityMainBinding
 import com.example.shoplist.domain.ShopItem
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
     private lateinit var viewModel: MainViewModel
     private lateinit var shopItemAdapter: ShopItemAdapter
+    private var shopItemFragment : FragmentContainerView? = null
     private lateinit var binding : ActivityMainBinding
 
 
@@ -20,18 +23,17 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        shopItemFragment = binding.fragmentContainerViewTag
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         initRv()
         viewModel.listOfItems.observe(this, {
             shopItemAdapter.submitList(it)
         })
-        binding.floatingActionButton.setOnClickListener({
-            val intent = ShopItemActivity.newIntentAdd(this)
-            startActivity(intent)
-        })
+
 
 
     }
+
 
     fun initRv(){
 
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 recycledViewPool.setMaxRecycledViews(ShopItemAdapter.inActivetype,ShopItemAdapter.maxPool)
             }
         }
-
+        setButtonOnClikcListener()
         setUpLongClickListener()
         setUpOnClickListener()
         setUpOnSwipeListener()
@@ -71,16 +73,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpOnClickListener() {
+        if (!isLandOrient()){
         shopItemAdapter.onItemClickListener = {
             val intent = ShopItemActivity.newIntentEdit(this@MainActivity,it.id)
-            startActivity(intent)
+            startActivity(intent)}
         }
+        else{
+            shopItemAdapter.onItemClickListener =  {
+                val fragment = ShopItemFragment.newEditFragment(it.id)
+                lauchFragment(fragment)
+            } }
+    }
+    private fun setButtonOnClikcListener() {
+        if (!isLandOrient()) {
+            binding.floatingActionButton.setOnClickListener({
+                val intent = ShopItemActivity.newIntentAdd(this)
+                startActivity(intent)
+            })
+        }
+        else{
+            binding.floatingActionButton.setOnClickListener({
+                val fragment = ShopItemFragment.newAddFragment()
+                lauchFragment(fragment)
+            })
+
+        }
+
+    }
+
+    private fun lauchFragment(fragment: ShopItemFragment) {
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container_view_tag, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setUpLongClickListener() {
         shopItemAdapter.onLongItemClickListener = {
             viewModel.changeIsActiveState(it)
         }
+    }
+    private fun isLandOrient():Boolean{
+       return when(shopItemFragment){
+            null ->false
+            else ->true
+        }
+    }
+
+    override fun onEditingFinished() {
+        supportFragmentManager.popBackStack()
     }
 }
 

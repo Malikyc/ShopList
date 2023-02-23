@@ -9,44 +9,23 @@ import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import androidx.lifecycle.ViewModelProvider
+import com.example.shoplist.R
 import com.example.shoplist.databinding.ActivityShopItemBinding
 import com.example.shoplist.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
 
-class ShopItemActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityShopItemBinding
-    private lateinit var tilNameAct : TextInputLayout
-    private lateinit var tilAmountAct : TextInputLayout
-    private lateinit var etNameAct :  EditText
-    private lateinit var etAmountAct : EditText
-    private lateinit var saveButtonAct : Button
-
-    private lateinit var viewModel: ShopItemViewModel
-
+class ShopItemActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
     private var current_mode = UNIDENTIFED_MODE
     private var shopItem_id = ShopItem.UNDEFINDED_ID
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        binding = ActivityShopItemBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        viewModel = ViewModelProvider(this@ShopItemActivity)[ShopItemViewModel::class.java]
+        setContentView(R.layout.activity_shop_item)
         parseIntent()
-        initViews()
-        if(current_mode == EXTRA_MODE_ADD){
-            subscribeOnLiveData()
-            createOnWriteListener()
-            addNewItem()
+        if(savedInstanceState == null){
+        turnOnRightMode()
         }
-        else if (current_mode == EXTRA_MODE_EDIT){
-            subscribeOnLiveData()
-            createOnWriteListener()
-            editItem()
-        }
-
-
-
     }
 
     private fun parseIntent(){
@@ -66,85 +45,15 @@ class ShopItemActivity : AppCompatActivity() {
         }
     }
 
-    private fun initViews(){
-        with(binding){
-            tilNameAct = tilName
-            tilAmountAct = tilAmount
-            etNameAct = etName
-            etAmountAct = etAmount
-            saveButtonAct = saveButton
+    private fun turnOnRightMode(){
+    val fragment =when(current_mode ){
+        EXTRA_MODE_ADD -> ShopItemFragment.newAddFragment()
+        EXTRA_MODE_EDIT -> ShopItemFragment.newEditFragment(shopItem_id)
+        else -> throw RuntimeException("Unknown screenMode")
         }
-    }
-
-    private fun addNewItem(){
-        saveButtonAct.setOnClickListener{
-            val name :String = etNameAct.text.toString()
-            val amount = etAmountAct.text.toString()
-            viewModel.addNewShopItem(name,amount)
-        }
-
-    }
-    private fun editItem(){
-        viewModel.getShopItem(shopItem_id)
-        viewModel.shopItemLive.observe(this) {
-            etNameAct.setText(it.name)
-            etAmountAct.setText(it.amount.toString())
-        }
-        saveButtonAct.setOnClickListener{
-            val name :String = etNameAct.text.toString()
-            val amount = etAmountAct.text.toString()
-            viewModel.editShopItem(name,amount)
-        }
-
-    }
-
-    fun subscribeOnLiveData(){
-        viewModel.errorInputName.observe(this) {
-            when(it){
-                true-> tilNameAct.error = "Error"
-                false-> tilNameAct.error = null
-            }
-        }
-        viewModel.errorInputAmount.observe(this) {
-            when(it){
-                true-> tilAmountAct.error = "Error"
-                false-> tilAmountAct.error = null
-            }
-        }
-        viewModel.shouldBeClosed.observe(this) {
-            if(true){
-                intent = Intent(this,MainActivity::class.java)
-                startActivity(intent)
-        }
-        }
-    }
-
-    private fun createOnWriteListener(){
-
-     etNameAct.addTextChangedListener(object : TextWatcher{
-         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-         }
-
-         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-             viewModel.resetErrorInputName()
-         }
-
-         override fun afterTextChanged(s: Editable?) {
-         }
-
-     })
-     etAmountAct.addTextChangedListener(object : TextWatcher{
-         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-         }
-
-         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-             viewModel.resetErrorInputAmount()
-         }
-
-         override fun afterTextChanged(s: Editable?) {
-         }
-
-     })
+    supportFragmentManager.beginTransaction()
+        .replace(R.id.shop_item_container, fragment)
+        .commit()
     }
 
     companion object{
@@ -167,5 +76,9 @@ class ShopItemActivity : AppCompatActivity() {
             return intent
         }
 
+    }
+
+    override fun onEditingFinished() {
+        finish()
     }
 }
