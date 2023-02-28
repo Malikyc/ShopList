@@ -13,9 +13,10 @@ import com.example.shoplist.databinding.ActivityMainBinding
 import com.example.shoplist.domain.ShopItem
 
 class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by lazy{
+        ViewModelProvider(this)[MainViewModel::class.java]
+    }
     private lateinit var shopItemAdapter: ShopItemAdapter
-    private var shopItemFragment : FragmentContainerView? = null
     private lateinit var binding : ActivityMainBinding
 
 
@@ -23,12 +24,11 @@ class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListe
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        shopItemFragment = binding.fragmentContainerViewTag
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         initRv()
         viewModel.listOfItems.observe(this, {
             shopItemAdapter.submitList(it)
         })
+
 
 
 
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListe
         }
     }
     private fun isLandOrient():Boolean{
-       return when(shopItemFragment){
+       return when(binding.fragmentContainerViewTag){
             null ->false
             else ->true
         }

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.shoplist.presentation.ShopItemViewModel" />
+    </data>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,6 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tilAmount"
         android:layout_height="wrap_content"
+        isInErrorInput="@{viewModel.errorInputName}"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="177dp"
         app:layout_constraintVertical_chainStyle="packed">
@@ -22,8 +29,10 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etName"
             android:layout_width="match_parent"
+            onWriteListener="@{()-> viewModel.resetErrorInputName()}"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
+            android:text="@{viewModel.shopItemLive.name}"
             android:hint="Name" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -37,6 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilName"
         android:layout_height="wrap_content"
+        isInErrorInput="@{viewModel.errorInputAmount}"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="177dp">
 
@@ -44,6 +54,8 @@
             android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@{String.valueOf(viewModel.shopItemLive.amount)}"
+            onWriteListener="@{()-> viewModel.resetErrorInputAmount()}"
             android:inputType="number"
             android:hint="Amount" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -61,3 +73,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

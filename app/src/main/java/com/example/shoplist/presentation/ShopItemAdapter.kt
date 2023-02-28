@@ -1,8 +1,12 @@
 package com.example.shoplist.presentation
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.ListAdapter
 import com.example.shoplist.R
+import com.example.shoplist.databinding.ItemActiveShopBinding
+import com.example.shoplist.databinding.ItemInaactiveShopBinding
 import com.example.shoplist.domain.ShopItem
 
 class ShopItemAdapter : ListAdapter<ShopItem,ShopItemViewHolder>(SimpleItemCallBack()){
@@ -16,28 +20,40 @@ class ShopItemAdapter : ListAdapter<ShopItem,ShopItemViewHolder>(SimpleItemCallB
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
-        if (viewType == activeType){
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_active_shop,parent,false)
-        return ShopItemViewHolder(view)}
-        else{
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_inaactive_shop,parent,false)
-            return ShopItemViewHolder(view)
+        val layout = when (viewType){
+        activeType->R.layout.item_active_shop
+        inActivetype->R.layout.item_inaactive_shop
+        else -> throw RuntimeException("Unknown viewType")}
+            val binding = DataBindingUtil.inflate<ViewDataBinding>(
+                LayoutInflater.from(parent.context),
+                layout,
+                parent,
+                false
+            )
+            return ShopItemViewHolder(binding)
         }
-    }
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
-         val shopItem = getItem(position)
-        with(holder) {
-            name.text = shopItem.name
-            amount.text = shopItem.amount.toString()
-            itemView.setOnLongClickListener {
+          val shopItem = getItem(position)
+           val binding = holder.binding
+            binding.root.setOnLongClickListener {
                 onLongItemClickListener?.invoke(shopItem)
                 true
             }
-            itemView.setOnClickListener{
+            binding.root.setOnClickListener{
                 onItemClickListener?.invoke(shopItem)
-            }
         }
+        when(binding){
+        is ItemActiveShopBinding ->{
+            binding.tvName.text = shopItem.name
+            binding.tvAmount.text = shopItem.amount.toString()
+        }
+        is ItemInaactiveShopBinding->{
+            binding.tvName.text = shopItem.name
+            binding.tvAmount.text = shopItem.amount.toString()
+        }
+        }
+
     }
 
 
