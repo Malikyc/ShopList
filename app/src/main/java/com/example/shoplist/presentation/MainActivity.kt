@@ -9,10 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoplist.R
+import com.example.shoplist.data.AppDatabase
 import com.example.shoplist.databinding.ActivityMainBinding
 import com.example.shoplist.domain.ShopItem
 
+
 class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
+
+
     private val viewModel: MainViewModel by lazy{
         ViewModelProvider(this)[MainViewModel::class.java]
     }
@@ -28,13 +32,7 @@ class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListe
         viewModel.listOfItems.observe(this, {
             shopItemAdapter.submitList(it)
         })
-
-
-
-
     }
-
-
     fun initRv(){
 
         shopItemAdapter = ShopItemAdapter()
