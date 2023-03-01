@@ -1,13 +1,17 @@
 package com.example.shoplist.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.example.shoplist.data.ShopListRepositoryImpl
 import com.example.shoplist.domain.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-class ShopItemViewModel : ViewModel() {
-    private val shopListRepository = ShopListRepositoryImpl
+class ShopItemViewModel (application: Application) : AndroidViewModel(application) {
+    private val shopListRepository = ShopListRepositoryImpl(application)
+
 
     private val addShopItemUseCase = AddShopItemUseCase(shopListRepository)
     private val editShopItemUseCase = EditShopItemUseCase(shopListRepository)
@@ -31,30 +35,37 @@ class ShopItemViewModel : ViewModel() {
 
 
     fun addNewShopItem (inputName : String? , inputAmount : String?) {
-        val name = parseName(inputName)
-        val amount = parseAmount(inputAmount)
-        if(validateInput(name,amount)){
-            val shopItem = ShopItem(name,amount,true)
-        addShopItemUseCase.addShopItem(shopItem)
-            finishWork()        }
+         val name = parseName(inputName)
+            val amount = parseAmount(inputAmount)
+            if(validateInput(name,amount)) {
+                viewModelScope.launch {
+                    val shopItem = ShopItem(name, amount, true)
+                    addShopItemUseCase.addShopItem(shopItem)
+                    finishWork()
+                }
+            }
 
     }
 
     fun editShopItem(inputName : String? , inputAmount : String?){
-        val name = parseName(inputName)
-        val amount = parseAmount(inputAmount)
-        if(validateInput(name,amount)){
-            _shopItemLive.value?.let {
-                val shopItem = it.copy(name = name, amount = amount)
-                editShopItemUseCase.editShopItem(shopItem)
-                finishWork()
-            }
+         val name = parseName(inputName)
+            val amount = parseAmount(inputAmount)
+            if(validateInput(name,amount)){
+                viewModelScope.launch {
+                _shopItemLive.value?.let {
+                    val shopItem = it.copy(name = name, amount = amount)
+                    editShopItemUseCase.editShopItem(shopItem)
+                    finishWork()
                 }
+            } }
+
     }
 
     fun getShopItem(id:Int){
-       val shopItem = getShopItemByIdUseCase.getShopItemById(id)
-        _shopItemLive.value = shopItem
+        viewModelScope.launch {
+            val shopItem = getShopItemByIdUseCase.getShopItemById(id)
+            _shopItemLive.value = shopItem }
+
     }
 
 
@@ -94,4 +105,5 @@ class ShopItemViewModel : ViewModel() {
     private fun finishWork(){
         _shouldBeClosed.value = true
     }
+
 }
