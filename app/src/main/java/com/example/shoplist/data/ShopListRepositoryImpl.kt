@@ -5,12 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.example.shoplist.domain.ShopItem
 import com.example.shoplist.domain.ShopListRepository
+import javax.inject.Inject
 
-class ShopListRepositoryImpl(application: Application) :
+class ShopListRepositoryImpl @Inject constructor(
+                             private val dbDao : AppDatabaseDao,
+                             private val mapper : ShopListMapper ):
     ShopListRepository {
 
-    private val dbDao = AppDatabase.getInstance(application).appDataBaseDao()
-    private val mapper = ShopListMapper()
 
     override suspend fun addShopItem(shopItem: ShopItem) {
         dbDao.addShopItem(mapper.mapEntritytoDbModel(shopItem))

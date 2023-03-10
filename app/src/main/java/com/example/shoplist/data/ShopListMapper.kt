@@ -1,10 +1,11 @@
 package com.example.shoplist.data
 
 import com.example.shoplist.domain.ShopItem
+import javax.inject.Inject
 
-class ShopListMapper {
+class ShopListMapper @Inject constructor(){
 
-    fun mapDbModelToEntrity(shopItemDbModel: ShopItemDbModel): ShopItem {
+    fun mapDbModelToEntrity (shopItemDbModel: ShopItemDbModel): ShopItem {
         return ShopItem(
             shopItemDbModel.name,
             shopItemDbModel.amount, shopItemDbModel.isActive, shopItemDbModel.id
