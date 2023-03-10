@@ -8,14 +8,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ShopItemViewModel (application: Application) : AndroidViewModel(application) {
-    private val shopListRepository = ShopListRepositoryImpl(application)
+class ShopItemViewModel @Inject constructor(
+    private val addShopItemUseCase : AddShopItemUseCase,
+            private val editShopItemUseCase : EditShopItemUseCase,
+            private val getShopItemByIdUseCase : GetShopItemByIdUseCase
+        ) : ViewModel() {
 
-
-    private val addShopItemUseCase = AddShopItemUseCase(shopListRepository)
-    private val editShopItemUseCase = EditShopItemUseCase(shopListRepository)
-    private val getShopItemByIdUseCase = GetShopItemByIdUseCase(shopListRepository)
 
     private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName : LiveData<Boolean>

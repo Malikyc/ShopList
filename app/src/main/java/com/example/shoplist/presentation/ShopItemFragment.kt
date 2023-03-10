@@ -14,12 +14,21 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.shoplist.R
+import com.example.shoplist.ShopListApp
 import com.example.shoplist.databinding.FragmentShopItemBinding
 import com.example.shoplist.databinding.ItemActiveShopBinding
 import com.example.shoplist.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
+import javax.inject.Inject
 
 class ShopItemFragment() : Fragment() {
+
+    private val component by lazy {
+        (requireActivity().application as ShopListApp).component
+    }
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
     interface OnEditingFinishedListener{
         fun onEditingFinished()
@@ -38,10 +47,11 @@ class ShopItemFragment() : Fragment() {
 
 
     private val viewModel: ShopItemViewModel by lazy {
-        ViewModelProvider(this)[ShopItemViewModel::class.java]
+        ViewModelProvider(this,viewModelFactory)[ShopItemViewModel::class.java]
     }
 
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
         Log.i("SequenceOfLifeCycle","onAttach")
         if(context is OnEditingFinishedListener){
